@@ -96,14 +96,18 @@ router.post('/', authenticate, async (req: AuthRequest, res) => {
   }
 });
 
-// GET /api/orders — user's orders
+// GET /api/orders — user's orders (admin: ?all=true returns all orders)
 router.get('/', authenticate, async (req: AuthRequest, res) => {
   try {
+    const isAdmin = req.userRole === 'admin' || req.userRole === 'store_owner';
+    const fetchAll = isAdmin && req.query.all === 'true';
+
     const orders = await prisma.order.findMany({
-      where: { userId: req.userId },
+      where: fetchAll ? {} : { userId: req.userId },
       include: {
         items: { include: { product: true } },
         store: { select: { id: true, name: true, address: true } },
+        ...(fetchAll ? { user: { select: { id: true, name: true, email: true } } } : {}),
       },
       orderBy: { createdAt: 'desc' },
     });

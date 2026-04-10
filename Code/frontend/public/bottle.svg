@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <rect width="64" height="64" rx="12" fill="#c94611"/>
+  <!-- bottle neck -->
+  <rect x="26" y="8" width="12" height="10" rx="3" fill="white" opacity="0.95"/>
+  <!-- bottle cork -->
+  <rect x="28" y="6" width="8" height="5" rx="2" fill="#fae3d0"/>
+  <!-- bottle body -->
+  <path d="M20 28 C18 30 16 34 16 42 C16 50 20 56 32 56 C44 56 48 50 48 42 C48 34 46 30 44 28 L42 18 L22 18 Z" fill="white" opacity="0.95"/>
+  <!-- liquid fill -->
+  <path d="M21 38 C20 39 19 41 19 43 C19 50 24 53 32 53 C40 53 45 50 45 43 C45 41 44 39 43 38 Z" fill="#e87a38" opacity="0.7"/>
+  <!-- label -->
+  <rect x="22" y="30" width="20" height="10" rx="2" fill="#c94611" opacity="0.85"/>
+</svg>

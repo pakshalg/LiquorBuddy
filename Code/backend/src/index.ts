@@ -10,6 +10,8 @@ import storeRoutes from './routes/stores';
 import inventoryRoutes from './routes/inventory';
 import orderRoutes from './routes/orders';
 import alertRoutes from './routes/alerts';
+import categoryRoutes from './routes/categories';
+import productRoutes from './routes/products';
 import { setupInventorySocket } from './socket/inventory';
 
 export const prisma = new PrismaClient();
@@ -33,6 +35,8 @@ app.use('/api/stores', storeRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/alerts', alertRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/products', productRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {
