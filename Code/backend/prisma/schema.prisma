@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  phone     String?
+  address   String?
+  lat       Float?
+  lng       Float?
+  role      String   @default("customer") // customer | admin | store_owner
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  orders    Order[]
+  alerts    InventoryAlert[]
+
+  @@map("users")
+}
+
+model Store {
+  id          String   @id @default(cuid())
+  name        String
+  address     String
+  city        String
+  state       String
+  zip         String
+  phone       String
+  lat         Float
+  lng         Float
+  imageUrl    String?
+  description String?
+  hours       String   // JSON string: { mon: "9am-10pm", ... }
+  isActive    Boolean  @default(true)
+  rating      Float    @default(0)
+  reviewCount Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  inventory   StoreInventory[]
+  orders      Order[]
+
+  @@map("stores")
+}
+
+model Category {
+  id       String    @id @default(cuid())
+  name     String    @unique
+  slug     String    @unique
+  iconUrl  String?
+  sortOrder Int      @default(0)
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          String   @id @default(cuid())
+  name        String
+  brand       String
+  description String?
+  imageUrl    String?
+  abv         Float?   // alcohol by volume %
+  size        String   // e.g. "750ml", "1L", "6-pack"
+  type        String?  // e.g. "Bourbon", "IPA", "Merlot"
+  country     String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  categoryId  String
+  category    Category @relation(fields: [categoryId], references: [id])
+
+  inventory   StoreInventory[]
+  orderItems  OrderItem[]
+  alerts      InventoryAlert[]
+
+  @@map("products")
+}
+
+model StoreInventory {
+  id        String   @id @default(cuid())
+  quantity  Int      @default(0)
+  price     Float
+  inStock   Boolean  @default(true)
+  featured  Boolean  @default(false)
+  updatedAt DateTime @updatedAt
+
+  storeId   String
+  store     Store    @relation(fields: [storeId], references: [id])
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+
+  @@unique([storeId, productId])
+  @@map("store_inventory")
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  status      String      @default("pending") // pending | confirmed | preparing | out_for_delivery | delivered | cancelled
+  total       Float
+  subtotal    Float
+  tax         Float
+  deliveryFee Float       @default(0)
+  notes       String?
+  address     String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  storeId     String
+  store       Store       @relation(fields: [storeId], references: [id])
+
+  items       OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  quantity  Int
+  price     Float   // price at time of order
+
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model InventoryAlert {
+  id        String   @id @default(cuid())
+  type      String   // "back_in_stock" | "low_stock" | "new_arrival"
+  notified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+
+  @@unique([userId, productId, type])
+  @@map("inventory_alerts")
+}
